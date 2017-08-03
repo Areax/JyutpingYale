@@ -1,158 +1,22 @@
 var ja = angular.module('JyutpingApp', [])
 
+ONSET_JYUTPING = ['b', 'd', 'g', 'gw', 'z', 'p', 't', 'k', 'kw', 'c', 'm', 'n',
+  'ng', 'f', 'h', 's', 'l', 'w', 'j', ''
+]
+ONSET_YALE = ['b', 'd', 'g', 'gw', 'j', 'p', 't', 'k', 'k', 'ch', 'm', 'n', 
+  'ng', 'f', 'h', 's', 'l', 'w', 'y', ''
+]
 
+NUCLEUS_JYUTPING = ['aa', 'a', 'i', 'yu', 'u', 'oe', 'e', 'eo', 'o', 'm', 'ng']
+NUCLEUS_YALE = ['aa', 'a', 'i', 'yu', 'u', 'eu', 'e', 'eu', 'o', 'm', 'ng']
 
-ONSET = ['b', 'd', 'g', 'gw', 'z', 'p', 't', 'k', 'kw', 'c', 'm', 'n',
-  'ng', 'f', 'h', 's', 'l', 'w', 'j', '']
+CODA_JYUTPING = ['p', 't', 'k', 'm', 'n', 'ng', 'i', 'u', '']
+CODA_YALE = ['p', 't', 'k', 'm', 'n', 'ng', 'i', 'u', '']
 
-NUCLEUS = ['aa', 'a', 'i', 'yu', 'u', 'oe', 'e', 'eo', 'o', 'm', 'ng']
+TONE_JYUTPING = ['1', '2', '3', '4', '5', '6']
 
-CODA = ['p', 't', 'k', 'm', 'n', 'ng', 'i', 'u', '']
-
-TONE = ['1', '2', '3', '4', '5', '6']
-
-ONSET_TIPA = {
-  'b': 'p',
-  'd': 't',
-  'g': 'k',
-  'gw': 'k\\super w ',
-  'z': 'ts',
-  'p': 'p\\super h ',
-  't': 't\\super h ',
-  'k': 'k\\super h ',
-  'kw': 'k\\super w\\super h ',
-  'c': 'ts\\super h ',
-  'm': 'm',
-  'n': 'n',
-  'ng': 'N',
-  'f': 'f',
-  'h': 'h',
-  's': 's',
-  'l': 'l',
-  'w': 'w',
-  'j': 'j',
-  '': '',
-}
-
-FINAL_TIPA = {
-  'i': 'i',
-  'ip': 'ip\\textcorner ',
-  'it': 'it\\textcorner ',
-  'ik': 'Ik\\textcorner ',
-  'im': 'im',
-  'in': 'in',
-  'ing': 'IN',
-  'iu': 'iu',
-  'yu': 'y',
-  'yut': 'yt\\textcorner ',
-  'yun': 'yn',
-  'u': 'u',
-  'ut': 'ut\\textcorner ',
-  'uk': 'Uk\\textcorner ',
-  'un': 'un',
-  'ung': 'UN',
-  'ui': 'uY',
-  'e': 'E',
-  'ek': 'Ek\\textcorner ',
-  'eng': 'EN',
-  'ei': 'eI',
-  'eot': '8t\\textcorner ',
-  'eon': '8n',
-  'eoi': '8Y',
-  'oe': '\\oe ',
-  'oek': '\\oe k\\textcorner ',
-  'oeng': '\\oe N',
-  'o': 'O',
-  'ot': 'Ot\\textcorner ',
-  'ok': 'Ok\\textcorner ',
-  'on': 'On',
-  'ong': 'ON',
-  'oi': 'OY',
-  'ou': 'ou',
-  'ap': '5p\\textcorner ',
-  'at': '5t\\textcorner ',
-  'ak': '5k\\textcorner ',
-  'am': '5m',
-  'an': '5n',
-  'ang': '5N',
-  'ai': '5I',
-  'au': '5u',
-  'aa': 'a',
-  'aap': 'ap\\textcorner ',
-  'aat': 'at\\textcorner ',
-  'aak': 'ak\\textcorner ',
-  'aam': 'am',
-  'aan': 'an',
-  'aang': 'aN',
-  'aai': 'aI',
-  'aau': 'au',
-  'm': '\\s{m}',
-  'ng': '\\s{N}',
-}
-
-TONE_TIPA = {
-  '1': '55',
-  '2': '25',
-  '3': '33',
-  '4': '21',
-  '5': '23',
-  '6': '22',
-}
-
-// FINAL = set(FINAL_TIPA.keys())
-
-ONSET_YALE = {
-  'b': 'b',
-  'd': 'd',
-  'g': 'g',
-  'gw': 'gw',
-  'z': 'j',
-  'p': 'p',
-  't': 't',
-  'k': 'k',
-  'kw': 'k',
-  'c': 'ch',
-  'm': 'm',
-  'n': 'n',
-  'ng': 'ng',
-  'f': 'f',
-  'h': 'h',
-  's': 's',
-  'l': 'l',
-  'w': 'w',
-  'j': 'y',
-  '': '',
-}
-
-NUCLEUS_YALE = {
-  'aa': 'aa',
-  'a': 'a',
-  'i': 'i',
-  'yu': 'yu',
-  'u': 'u',
-  'oe': 'eu',
-  'e': 'e',
-  'eo': 'eu',
-  'o': 'o',
-  'm': 'm',
-  'ng': 'ng',
-}
-
-CODA_YALE = {
-  'p': 'p',
-  't': 't',
-  'k': 'k',
-  'm': 'm',
-  'n': 'n',
-  'ng': 'ng',
-  'i': 'i',
-  'u': 'u',
-  '': '',
-}
 vowels = ['a', 'e', 'i', 'o', 'u']
-
 tones_index = ['3', '1', '0', '2', '1', '0']
-
 vowelLetters = [
   ['a', 'e', 'i', 'o', 'u'], // tones 3 and 6
   ['á', 'é', 'í', 'ó', 'ú'], // tones 2 and 5
@@ -203,10 +67,10 @@ function jyutpingToYale(jpSentence) {
   jp_list.forEach((jpParseable) => {
     jpParsed = ParseJyutping(jpParseable)
 
-    onset = ONSET_YALE[jpParsed[0]]
-    nucleus = NUCLEUS_YALE[jpParsed[1]]
-    coda = CODA_YALE[jpParsed[2]]
-    tone = jpParsed[3]  // still in ParseJyutping
+    onset = ONSET_YALE[ONSET_JYUTPING.indexOf(jpParsed[0])]
+    nucleus = NUCLEUS_YALE[NUCLEUS_JYUTPING.indexOf(jpParsed[1])]
+    coda = CODA_YALE[CODA_JYUTPING.indexOf(jpParsed[2])]
+    tone = jpParsed[3] // still in ParseJyutping
 
     // jyutping2yale system uses "h" to mark the three low tones
     if (isStringInObject(tone, ["4", "5", "6"])) {
@@ -280,60 +144,6 @@ function jyutpingToYale(jpSentence) {
 
 
   return yaleList.join(" ")
-  // Output yaleList as a string
-  // Check if(there's potential ambiguity when Yale strings are concatenated
-
-  // Ambiguity case 1:
-  //   1st syllable coda is one of the "ambiguousConsonants"
-  //   and 2nd syllable starts with a vowel *letter*
-
-  // Ambiguity case 2:
-  //   1st syllable has no coda and 2nd syllable starts with one of the
-  //   "ambiguousConsonants"
-  //   e.g., hei3hau6 'climate' --> heihauh
-  //   (middle "h" for tone in 1st syllable or being onset of 2nd syllable?)
-
-  if (len(yaleList) == 1) {
-    return yaleList[0]
-  }
-
-  ambiguousConsonants = ['h', 'p', 't', 'k', 'm', 'n', 'ng']
-  vowelLetters = ['a', 'e', 'i', 'o', 'u',
-    'á', 'é', 'í', 'ó', 'ú',
-    'à', 'è', 'ì', 'ò', 'ù',
-    'ā', 'ē', 'ī', 'ō', 'ū']
-
-  outputStr = ''
-
-  for (i in range(len(yaleList) - 1)) {
-    yale1 = yaleList[i]
-    yale2 = yaleList[i + 1]
-
-    ambiguous = False
-
-    // test case 1:
-    if (endswithoneof(yale1, ambiguousConsonants) &&
-      startswithoneof(yale2, vowelLetters)) {
-      ambiguous = True
-    }
-
-    // test case 2:
-    if (!ambiguous &&
-      !endswithoneof(yale1, ambiguousConsonants) &&
-      !startswithoneof(yale2, ambiguousConsonants)) {
-      ambiguous = True
-    }
-
-    outputStr += yale1
-
-    if (ambiguous) {
-      outputStr += '\''
-    }
-  }
-
-  outputStr += yaleList[-1]
-
-  return outputStr
 }
 
 function ParseJyutping(jp) {
@@ -344,22 +154,22 @@ function ParseJyutping(jp) {
   cvc = jp.slice(0, -1)
 
   // tone
-  if (!TONE.includes(tone))
+  if (!TONE_JYUTPING.includes(tone))
     throw Error('tone error -- ' + jp.toString())
 
   // coda
   if (!isStringInObject(cvc.slice(-1), 'ieaouptkmng'))
     throw Error('coda error -- ' + jp.toString())
 
-  else if (isStringInObject(cvc, CODA)) {
+  else if (isStringInObject(cvc, CODA_JYUTPING)) {
     jpParsedList.push(['', cvc, '', tone])
     return
   }
-  else if (isStringInObject(cvc.slice(-2), CODA)) {
+  else if (isStringInObject(cvc.slice(-2), CODA_JYUTPING)) {
     coda = cvc.slice(-2)
     cv = cvc.slice(0, -2)
   }
-  // else if (CODA.indexOf(cvc.slice(-1)) > -1) {
+  // else if (CODA_JYUTPING.indexOf(cvc.slice(-1)) > -1) {
   //   coda = cvc.slice(-1)
   //   cv = cvc.slice(0, -1)
   // }
@@ -376,7 +186,7 @@ function ParseJyutping(jp) {
 
   // nucleus, and then onset
   nucleus = ''
-  // right now AU can both be in here, when it shouldn't...
+.
   while (isStringInObject(cv.slice(-1), 'ieaouy')) {
     nucleus = cv.slice(-1) + nucleus
     cv = cv.slice(0, -1)
@@ -389,7 +199,7 @@ function ParseJyutping(jp) {
 
   onset = cv
 
-  if (!ONSET.includes(onset))
+  if (!ONSET_JYUTPING.includes(onset))
     throw Error('onset error -- ' + jp.toString())
 
   return [onset, nucleus, coda, tone]
@@ -405,7 +215,7 @@ function parse_final(final) {
     possible_nucleus = final.slice(0, i)
     possible_coda = final.slice(i)
 
-    if (NUCLEUS.includes(possible_nucleus) && CODA.includes(possible_coda))
+    if (NUCLEUS_JYUTPING.includes(possible_nucleus) && CODA_JYUTPING.includes(possible_coda))
       return possible_nucleus, possible_coda
   }
   return None
