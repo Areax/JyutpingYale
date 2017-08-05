@@ -19,7 +19,6 @@
 	<script src="javascript/lib/ui-bootstrap-tpls.min.js"></script>
 
 	<!--Javascript-->
-	<script src="javascript/JyutpingApp.js"></script>
 	<script src="javascript/JyutpingToYale.js"></script>
 	<!-- CSS -->
 	<link href="https://fonts.googleapis.com/css?family=Alice|Crimson+Text" rel="stylesheet">
@@ -49,7 +48,7 @@
 		<div class="areas">
 			<h1>Convert Jyutping and Yale</h1>
 			<section class="Yale">
-				<textarea class="editing" readonly>{{translation}}</textarea>
+				<textarea class="editing" readonly>{{translation}}||||{{error}}</textarea>
 			</section>
 		</div>
 	</div>
@@ -58,7 +57,7 @@
 	</div>
   </div>
 </section>
-		<div class="areas">{{error}}</div>
+		<div class="areas"></div>
 	</div>
 </body>
 

@@ -13,22 +13,23 @@ NUCLEUS_YALE = ['aa', 'a', 'i', 'yu', 'u', 'eu', 'e', 'eu', 'o', 'm', 'ng']
 CODA_JYUTPING = ['p', 't', 'k', 'm', 'n', 'ng', 'i', 'u', '']
 CODA_YALE = ['p', 't', 'k', 'm', 'n', 'ng', 'i', 'u', '']
 
-TONE_JYUTPING = ['1', '2', '3', '4', '5', '6']
+TONE_JYUTPING = [1,2,3,4,5,6]
 
-vowels = ['a', 'e', 'i', 'o', 'u']
+vowels = ['a', 'e', 'i', 'o', 'u', 'm', 'g']
+// tones get + 3 when there's an h, but maybe that shouldn't happen
 tones_index = [3, 1, 0, 2, 1, 0]
+yale_tones = [3,2,1,1]
 vowelLetters = [
-  ['a', 'e', 'i', 'o', 'u', 'm', 'n'], // tones 3 and 6
-  ['á', 'é', 'í', 'ó', 'ú', 'ḿ'], // tones 2 and 5
-  ['à', 'è', 'ì', 'ò', 'ù', 'ǹ'], // tone 4
+  ['a', 'e', 'i', 'o', 'u'], // tones 3 and 6
+  ['á', 'é', 'í', 'ó', 'ú'], // tones 2 and 5
+  ['à', 'è', 'ì', 'ò', 'ù'], // tone 4
   ['ā', 'ē', 'ī', 'ō', 'ū'] // tone 1
 ]
-yale_tones = [3, 2, 4, 1]
-vowelLettersUTF8 = [
-  ['\u0061', '\u0065', '\u0069', '\u006F', '\u0075'],
-  ['\u00E0', '\u00E8', '\u00EC', '\u00F2', '\u00F9'],
-  ['\u00E1', '\u00E9', '\u00ED', '\u00F3', '\u00FA'],
-  ['\u0101', '\u0113', '\u012B', '\u014D', '\u016B']
+accents = [
+  '', // adds nothing to letter
+  '\u0301', // adds accent to a letter
+  '\u0300', // adds grave to letter
+  '\u0304' // adds macron to letter
 ]
 
 ja.controller('JyutpingAppCtrl', function ($scope) {
@@ -42,9 +43,10 @@ ja.controller('JyutpingAppCtrl', function ($scope) {
 
   $scope.translate = function () {
     $scope.translation = jyutpingToYale($scope.stringToJyutping)
+    $scope.error = YaleToJyutping($scope.translation)
   }
   $scope.translation = jyutpingToYale($scope.stringToJyutping)
-  $scope.translation = getToneFromYaleWord('máaih')
+  $scope.error = YaleToJyutping('gòhk')
 })
 
 function jyutpingToYale(jpSentence) {
@@ -116,7 +118,7 @@ function jyutpingToYale(jpSentence) {
     // accent instead.
 
     letter = nucleus.charAt(0)  // nucleus 1st letter
-    nucleus = vowel_to_macron_vowel(letter, tone) + nucleus.slice(1)
+    nucleus = add_tone_mark_to_letter(letter, tone) + nucleus.slice(1)
 
     // add back "y" if(the nucleus is "yu"
     // ("y" was taken away for convenience in adding tone diacritic)
@@ -157,7 +159,7 @@ function ParseJyutping(jp) {
   cvc = jp.slice(0, -1)
 
   // tone
-  if (!TONE_JYUTPING.includes(tone))
+  if (!TONE_JYUTPING.includes(parseInt(tone)))
     throw Error('tone error -- ' + jp.toString())
 
   // coda
@@ -198,7 +200,7 @@ function ParseJyutping(jp) {
 
   if (!ONSET_JYUTPING.includes(onset))
     throw Error('onset error -- ' + jp.toString())
-
+    console.log([onset, nucleus, coda, tone])
   return [onset, nucleus, coda, tone]
 }
 
@@ -206,13 +208,80 @@ function isStringInObject(string, object) {
   return object.indexOf(string) > -1
 }
 
+function YaleToJyutping(yaleSentence) {
+
+  if(yaleSentence == '')
+    return
+  yale_list = yaleSentence.split(" ")
+
+  // // if (isNaN(jpStr.slice(-1)))
+  // //   throw Error('tone error -- ')
+
+  jyutpingList = []
+  yale_list.forEach((yaleParseable) => {
+    yaleParsed = ParseYale(yaleParseable)
+
+    onset = ONSET_JYUTPING[ONSET_YALE.indexOf(yaleParsed[0])]
+    nucleus = NUCLEUS_JYUTPING[NUCLEUS_YALE.indexOf(yaleParsed[1])]
+    coda = CODA_JYUTPING[CODA_YALE.indexOf(yaleParsed[2])]
+    tone = yaleParsed[3] // still in ParseJyutping
+
+    //remove diacritic from nucleus
+  //onset and coda should be ok ...?
+  //tone is set :)
+
+  // jyutping2yale system uses "h" to mark the three low tones
+    if (isStringInObject(tone, ["4", "5", "6"])) {
+      lowToneH = "h"
+    }
+    else {
+      lowToneH = ""
+    }
+
+    // in jyutping2yale, long "aa" vowel with no coda is denoted by "a"
+    if (nucleus == "a" && coda == "") {
+      nucleus = "aa"
+    }
+
+    // amibguity between eo and oe being replaced by eu
+    // oe oeng oek, eoi eon eot
+    if((coda === 'i' || coda === 'n' || coda ==='t') && nucleus === 'oe') {
+      nucleus = 'eo'
+    }
+
+    //nucleus = NUCLEUS_YALE[NUCLEUS_JYUTPING.indexOf(jpParsed[1])]
+    //coda = CODA_YALE[CODA_JYUTPING.indexOf(jpParsed[2])]
+
+    // when nucleus is "yu"...
+    // 1. disallow "yyu" (when onset is "y")
+    // 2. change nucleus "yu" into "u" -- this is a hack for adding tone
+    //       diacritic, since we don't want "y" to bear the diacritic
+    if (nucleus == 'u' && onset == 'y') {
+      onset = 'j'
+      nucleus = 'yu'
+    }
+
+    // ParseJyutping final "eu" should be jyutping2yale "ew" (not "eu")
+    if (coda == "w" && nucleus == "e") {
+      coda = "e"
+    }
+
+    // save the resultant jyutping2yale {
+    jyutping = onset + nucleus + coda + tone
+    jyutpingList.push(jyutping)
+  })
+  return jyutpingList.join(' ')
+}
+
 function ParseYale(yale) {
   if (yale.length < 2)
     throw Error('jale string has fewer than 2 characters -- ' + yale.toString())
 
-  tone = getToneFromYaleWord(yale)
-  cvc = yale.slice(0, -1)
+  x = getToneFromYaleWord(yale)
+  cvc = x[0]
+  tone = x[1]
 
+  //cvc = yale.slice(0, -1)
   // tone
   if (!TONE_JYUTPING.includes(tone))
     throw Error('tone error -- ' + yale.toString())
@@ -221,11 +290,10 @@ function ParseYale(yale) {
   if (!isStringInObject(cvc.slice(-1), 'ieaouptkmng'))
     throw Error('coda error -- ' + yale.toString())
 
-  else if (isStringInObject(cvc, CODA_JYUTPING)) {
-    jpParsedList.push(['', cvc, '', tone])
-    return
+  else if (isStringInObject(cvc, CODA_YALE)) {
+    return ['', cvc, '', tone]
   }
-  else if (isStringInObject(cvc.slice(-2), CODA_JYUTPING)) {
+  else if (isStringInObject(cvc.slice(-2), CODA_YALE)) {
     coda = cvc.slice(-2)
     cv = cvc.slice(0, -2)
   }
@@ -247,7 +315,7 @@ function ParseYale(yale) {
   // nucleus, and then onset
   nucleus = ''
 
-  while (isStringInObject(cv.slice(-1), 'ieaouy')) {
+  while (isStringInObject(cv.slice(-1), 'ieaou')) {
     nucleus = cv.slice(-1) + nucleus
     cv = cv.slice(0, -1)
     if (!cv)
@@ -259,82 +327,10 @@ function ParseYale(yale) {
 
   onset = cv
 
-  if (!ONSET_JYUTPING.includes(onset))
+  if (!ONSET_YALE.includes(onset))
     throw Error('onset error -- ' + yale.toString())
 
   return [onset, nucleus, coda, tone]
-
-  // jyutping2yale system uses "h" to mark the three low tones
-    if (isStringInObject(tone, ["4", "5", "6"])) {
-      lowToneH = "h"
-    }
-    else {
-      lowToneH = ""
-    }
-
-    // in jyutping2yale, long "aa" vowel with no coda is denoted by "a"
-    if (nucleus == "a" && coda == "") {
-      nucleus = "aa"
-    }
-
-
-    onset = ONSET_JYUTPING[ONSET_YALE.indexOf(yaleParsed[0])]
-    //nucleus = NUCLEUS_YALE[NUCLEUS_JYUTPING.indexOf(jpParsed[1])]
-    //coda = CODA_YALE[CODA_JYUTPING.indexOf(jpParsed[2])]
-
-
-    // when nucleus is "yu"...
-    // 1. disallow "yyu" (when onset is "y")
-    // 2. change nucleus "yu" into "u" -- this is a hack for adding tone
-    //       diacritic, since we don't want "y" to bear the diacritic
-    if (nucleus == 'u' && onset == 'y') {
-      onset = 'j'
-      nucleus = 'yu'
-    }
-
-    // when nucleus is "ng"
-    // the tone diacritic has to be on "g" but not "n"
-    // now we pretend that the nucleus is "g", and will prepend the "n" back
-    // at the end
-    if (nucleus == 'ng') {
-      nucleus = 'g'
-    }
-
-    // add the jyutping2yale tone diacritic to the first nucleus letter
-    // ParseJyutping tone 1      --> add macron
-    // ParseJyutping tone 2 or 5 --> add acute
-    // ParseJyutping tone 4      --> add grave
-    // ParseJyutping tone 3 or 6 --> (no diacritic)
-    // if(the accented letter doesn't exist in unicode, use the combining
-    // accent instead.
-
-    letter = nucleus.charAt(0)  // nucleus 1st letter
-    nucleus = vowel_to_macron_vowel(letter, tone) + nucleus.slice(1)
-
-    // add back "y" if(the nucleus is "yu"
-    // ("y" was taken away for convenience in adding tone diacritic)
-    if (jpParsed[1] == "yu") {
-      nucleus = "y" + nucleus
-    }
-
-    // add back "n" if(the nucleus is "ng"
-    // ('n' was taken away so that tone diacritic is on "g" but not "n")
-    if (jpParsed[1] == 'ng') {
-      nucleus = 'n' + nucleus
-    }
-
-    // ParseJyutping final "eu" should be jyutping2yale "ew" (not "eu")
-    if (coda == "u" && nucleus == "e") {
-      coda = "w"
-    }
-
-    // save the resultant jyutping2yale
-    if (isStringInObject(coda, ["i", "u", "w"]) && isStringInObject(tone, ["4", "5", "6"])) {
-      yale = onset + nucleus + coda + lowToneH
-    }
-    else {
-      yale = onset + nucleus + lowToneH + coda
-    }
 }
 
 function isStringInObject(string, object) {
@@ -361,13 +357,23 @@ function vowel_to_macron_vowel(vowel, tone) {
   return vowelLetters[tones_index[tone - 1]][vowels.indexOf(vowel)]
 }
 
+function add_tone_mark_to_letter(letter, tone) {
+  return letter + accents[tones_index[tone-1]]
+}
+
 function getToneFromYaleWord(yaleWord) {
-  vowelWithTone = yaleWord.replace(/[^aeiou\u00E0-\u016B]+([aeiou\u00E0-\u016B]).*/, '$1')
-  hasAnH = isStringInObject('h', yaleWord.slice(yaleWord.indexOf(vowelWithTone)+1, yaleWord.length)) ? 3 : 0
+  regex = new RegExp('[^\u00E0-\u016B' + accents.join('') + ']+([\u00E0-\u016B' + accents.join('') + ']).*')
+  accent = yaleWord.replace(regex, '$1')
+  if(accent.length > 1)
+    accent = ''
+  hasAnH = isStringInObject('h', yaleWord.slice(yaleWord.indexOf(accent)+1, yaleWord.length)) ? 3 : 0
+  if(hasAnH == 3)
+    yaleWord = yaleWord.replace(/(.+)h([^h]*)$/, '$1$2')
+
   for(i = 0; i < vowelLetters.length; i++) {
-    if(isStringInObject(vowelWithTone, vowelLetters[i])) {
-      return yale_tones[i] + hasAnH
-    } 
+    if(isStringInObject(accent, accents[i])) {
+      return [yaleWord.replace(accent, ""), yale_tones[i] + hasAnH]
+    }
   }
 }
 
