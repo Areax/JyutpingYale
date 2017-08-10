@@ -43,10 +43,14 @@ ja.controller('JyutpingAppCtrl', function ($scope) {
 
   $scope.translate = function () {
     $scope.translation = jyutpingToYale($scope.stringToJyutping)
-    $scope.error = YaleToJyutping($scope.translation)
   }
-  $scope.translation = jyutpingToYale($scope.stringToJyutping)
-  $scope.error = YaleToJyutping('gòhk')
+
+  $scope.translateToJyutping = function () {
+    $scope.translation = yaleToJyutping($scope.stringToJyutping)
+  }
+
+  // $scope.translation = jyutpingToYale($scope.stringToJyutping)
+
 })
 
 function jyutpingToYale(jpSentence) {
@@ -200,7 +204,7 @@ function ParseJyutping(jp) {
 
   if (!ONSET_JYUTPING.includes(onset))
     throw Error('onset error -- ' + jp.toString())
-    console.log([onset, nucleus, coda, tone])
+    
   return [onset, nucleus, coda, tone]
 }
 
@@ -208,7 +212,7 @@ function isStringInObject(string, object) {
   return object.indexOf(string) > -1
 }
 
-function YaleToJyutping(yaleSentence) {
+function yaleToJyutping(yaleSentence) {
 
   if(yaleSentence == '')
     return

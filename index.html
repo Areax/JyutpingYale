@@ -35,22 +35,24 @@
 	<section class="jyutping">
 		<p>
 			<span class="jyutping_input">
-				Insert Your Jyutping Here
+				Insert Your Jyutping or Yale Here
 			</span>
 		</p>
 	</section>
 	<div ng-controller="JyutpingAppCtrl">
 		<input type="textarea" ng-model="stringToJyutping"/>
-		<button ng-click="translate()">Translate</button>
+		<button ng-click="translate()">Jyutping To Yale</button>
+		<button ng-click="translateToJyutping()">Yale To Jyutping</button>
 
 		<br/><br/><br/>
 
 		<div class="areas">
 			<h1>Convert Jyutping and Yale</h1>
 			<section class="Yale">
-				<textarea class="editing" readonly>{{translation}}||||{{error}}</textarea>
+				<textarea class="editing" readonly>{{translation}}</textarea>
 			</section>
 		</div>
+		{{error}}
 	</div>
 	<div class="table rendered">
 		<table></table>
